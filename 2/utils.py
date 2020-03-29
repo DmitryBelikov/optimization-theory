@@ -2,10 +2,13 @@ from scipy.optimize import linprog
 
 from samples import *
 from simplex_method import simplex_method
+import numpy as np
 
 
 def python_simplex_method(q, a, b):
-    return linprog(c=q, A_eq=a, b_eq=b, method="simplex")
+    ans = linprog(c=q, A_eq=a, b_eq=b, method="simplex")
+    print(ans)
+    return ans
 
 
 def print_results(method_results, msg=""):
@@ -16,15 +19,15 @@ def print_results(method_results, msg=""):
         print("Optimization failed.")
 
 
-def single_test(q, a, b, test_name):
+def single_test(q, a, b, test_name="Unknown test"):
     python_ans = python_simplex_method(q, a, b)
     my_ans = simplex_method(q, a, b)
     if python_ans.success == my_ans.success:
-        if python_ans == "False":
-            print(test_name + ": correct")
+        if not python_ans.success:
+            print(test_name + ": correct", python_ans.success)
             return True
-        if (python_ans.fun - my_ans.fun) < 1e-15:
-            print(test_name + ": correct")
+        if (abs(python_ans.fun - my_ans.fun)) < 1e-7:
+            print(test_name + ": correct", python_ans.fun)
             return True
         else:
             print(test_name + ": wrong")

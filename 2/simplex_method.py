@@ -7,38 +7,98 @@ class simplexMethodResults:
         self.fun = fun
 
 
+def check_if_basis(a, j):
+    count = 0
+    for i in range(a.shape[0]):
+        if a[i][j] == 0:
+            count += 1
+    return count == a.shape[0] - 1
+
+
 def simplex_method(q, a, b):
-    q = np.array(q) * (-1)
-    q0 = 0
-    a = np.array(a, np.float)
-    b = np.array(b)
+    a = np.hstack((np.array(a, np.float), np.eye(len(a))))
+    q = np.hstack((np.array(q, np.float) * (-1), np.zeros(a.shape[0], np.float)))
+    M = 100.0
+    for i in range(0, len(a)):
+        q[-i - 1] = -M
+    q0 = 0.0
+    for i in range(0, a.shape[0]):
+        q = q + a[i] * M
+        q0 += b[i] * M
+
+    b = np.array(b, np.float)
     # print("q", q)
     # print("a", a)
     # print("b", b)
     while not all(q <= 0):
         max_q = np.amax(q)
-        max_column_idx = np.where(q == max_q)[0][0]
-        pivot_column = b / a[:, max_column_idx]
-        zero_more = [x for x in pivot_column if x >= 0]
-        if len(zero_more) == 0:
+        l = np.where(q == max_q)[0][0]
+        # if not all(a[:, l] != 0):
+        #     return simplexMethodResults(True, q0)
+        pivot_column = b / a[:, l]
+        cur_min = np.inf
+        r = -1
+        for i in range(0, len(pivot_column)):
+            if 0 < pivot_column[i] <= cur_min:
+                if pivot_column[i] == cur_min:
+                    if a[r, l] > a[i, l]:
+                        r = i
+                        cur_min = pivot_column[i]
+                else:
+                    r = i
+                    cur_min = pivot_column[i]
+        if r == -1:
+            return simplexMethodResults(True, q0)
+        pivot_el = a[r][l]
+        if pivot_el == 0:
             return simplexMethodResults(False, q0)
-        min_b_div_min_q = np.amin(zero_more)
-        min_row_idx = np.where(pivot_column == min_b_div_min_q)[0][0]
-        pivot_el = a[min_row_idx][max_column_idx]
         for i in range(0, len(b)):
-            if i == min_row_idx:
+            if i == r:
                 continue
-            multiplier = -a[i, max_column_idx] / pivot_el
-            fix_row = a[min_row_idx] * multiplier
-            fix_b = b[min_row_idx] * multiplier
+            multiplier = -a[i, l] / pivot_el
+            fix_row = a[r] * multiplier
+            fix_b = b[r] * multiplier
             a[i] = a[i] + fix_row
             b[i] = b[i] + fix_b
-        multiplier = -q[max_column_idx] / pivot_el
-        q = q + a[min_row_idx] * multiplier
-        q0 = q0 + b[min_row_idx] * multiplier
-        # print("a = ", a)
+        multiplier = -q[l] / pivot_el
+        q = q + a[r] * multiplier
+        q0 = q0 + b[r] * multiplier
+
+        # print("Privet dima a = \n", a)
         # print("q < 0")
         # print("q = ", q)
         # print("b = ", b)
         # print("q0 = ", q0)
-    return simplexMethodResults(True, q0)
+    res = False
+    for i in range(a.shape[0]):
+        res = res or check_if_basis(a, -i - 1)
+    for i in range(a.shape[1]):
+        print(check_if_basis(a, i), end=" ")
+    print()
+    print(a)
+    print(b)
+    return simplexMethodResults(not res, q0)
+
+# DOC METHOD
+# l stolbec
+# r stroka
+# resulting_a = np.zeros((a.shape[0], a.shape[1]))
+# resulting_q = np.zeros(a.shape[1])
+# resulting_b = np.zeros(a.shape[0])
+# for i in range(a.shape[0]):
+#     resulting_a[i, l] = -a[i, l] / pivot_el
+# resulting_a[r, l] /= pivot_el
+# resulting_q[l] = -q[l] / pivot_el
+# for i in range(a.shape[0]):
+#     for j in range(a.shape[1]):
+#         if j == l:
+#             continue
+#         resulting_a[i, j] = a[i, j] - a[r, j] * a[i, l] / a[r, l]
+# for j in range(a.shape[1]):
+#     resulting_q[j] = q[j] - a[r, j] * q[l] / a[r, l]
+# for i in range(a.shape[0]):
+#     resulting_b[i] = b[i] - b[r] * a[i, l] / a[r, l]
+# q0 = q0 - b[r] * q[l] / a[r, l]
+# a = resulting_a
+# b = resulting_b
+# q = resulting_q

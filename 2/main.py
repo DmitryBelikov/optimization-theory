@@ -1,8 +1,10 @@
-from utils import full_test
+from utils import *
 
 
 def main():
-    full_test()
+    q, a, b = variants_sample6()
+    single_test(q, a, b, "test1")
+    # full_test()
 
 
 if __name__ == '__main__':
