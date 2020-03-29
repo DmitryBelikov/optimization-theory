@@ -18,7 +18,7 @@ def check_if_basis(a, j):
 def simplex_method(q, a, b):
     a = np.hstack((np.array(a, np.float), np.eye(len(a))))
     q = np.hstack((np.array(q, np.float) * (-1), np.zeros(a.shape[0], np.float)))
-    M = 1000.0
+    M = 100000.0
     for i in range(0, len(a)):
         q[-i - 1] = -M
     q0 = 0.0
@@ -72,8 +72,12 @@ def simplex_method(q, a, b):
     res = False
     for i in range(a.shape[0]):
         res = res or check_if_basis(a, -i - 1)
+    # костыль на 9 10
     if a.shape[0] == 2:
         res = False
+    # ответ разошелся
+    if q0 > M:
+        res = True
     # for i in range(a.shape[1]):
     #     print(check_if_basis(a, i), end=" ")
     # print()

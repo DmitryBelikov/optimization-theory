@@ -34,7 +34,7 @@ def single_test(q, a, b, test_name="Unknown test"):
             print("     Python ans =", python_ans.fun)
             return False
     else:
-        print(test_name + ": wrong")
+        print(test_name + ": wrong", python_ans.fun)
         print("     My ans =", my_ans.success)
         print("     Python ans =", python_ans.success)
         return False
