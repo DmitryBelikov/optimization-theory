@@ -1,13 +1,12 @@
 from scipy.optimize import linprog
 
-from samples import *
-from simplex_method import simplex_method
-import numpy as np
+from lab2.samples import *
+from lab2.simplex_method import simplex_method
 
 
 def python_simplex_method(q, a, b):
     ans = linprog(c=q, A_eq=a, b_eq=b, method="simplex")
-    print(ans)
+    # print(ans)
     return ans
 
 

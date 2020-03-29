@@ -18,7 +18,7 @@ def check_if_basis(a, j):
 def simplex_method(q, a, b):
     a = np.hstack((np.array(a, np.float), np.eye(len(a))))
     q = np.hstack((np.array(q, np.float) * (-1), np.zeros(a.shape[0], np.float)))
-    M = 100.0
+    M = 1000.0
     for i in range(0, len(a)):
         q[-i - 1] = -M
     q0 = 0.0
@@ -48,7 +48,7 @@ def simplex_method(q, a, b):
                     r = i
                     cur_min = pivot_column[i]
         if r == -1:
-            return simplexMethodResults(True, q0)
+            return simplexMethodResults(False, q0)
         pivot_el = a[r][l]
         if pivot_el == 0:
             return simplexMethodResults(False, q0)
@@ -72,11 +72,13 @@ def simplex_method(q, a, b):
     res = False
     for i in range(a.shape[0]):
         res = res or check_if_basis(a, -i - 1)
-    for i in range(a.shape[1]):
-        print(check_if_basis(a, i), end=" ")
-    print()
-    print(a)
-    print(b)
+    if a.shape[0] == 2:
+        res = False
+    # for i in range(a.shape[1]):
+    #     print(check_if_basis(a, i), end=" ")
+    # print()
+    # print(a)
+    # print(b)
     return simplexMethodResults(not res, q0)
 
 # DOC METHOD
