@@ -1,10 +1,11 @@
 import numpy as np
 
 
-class simplexMethodResults:
-    def __init__(self, success, fun):
+class SimplexMethodResults:
+    def __init__(self, success, fun, x):
         self.success = success
         self.fun = fun
+        self.x = x
 
 
 def check_if_basis(a, j):
@@ -40,11 +41,11 @@ def simplex_method(c, a, b):
                 r = i
                 cur_min = pivot_column[i]
         if r == -1:
-            return simplexMethodResults(False, q0)
+            return SimplexMethodResults(False, q0, [])
         basis[r] = l
         pivot_el = a[r][l]
         if pivot_el == 0:
-            return simplexMethodResults(False, q0)
+            return SimplexMethodResults(False, q0, [])
         for i in range(0, len(b)):
             if i == r:
                 continue
@@ -56,8 +57,11 @@ def simplex_method(c, a, b):
         multiplier = -c[l] / pivot_el
         c = c + a[r] * multiplier
         q0 = q0 + b[r] * multiplier
-
     res = any(basis > a.shape[1] - a.shape[0] - 1)
     if q0 > M:
         res = True
-    return simplexMethodResults(not res, q0)
+    x = [0] * (a.shape[1] - a.shape[0])
+    if not res:
+        for i in range(a.shape[0]):
+            x[basis[i]] = b[i] / a[i][basis[i]]
+    return SimplexMethodResults(not res, q0, x)

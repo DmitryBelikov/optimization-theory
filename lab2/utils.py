@@ -6,7 +6,6 @@ from lab2.simplex_method import simplex_method
 
 def python_simplex_method(q, a, b):
     ans = linprog(c=q, A_eq=a, b_eq=b, method="simplex")
-    # print(ans)
     return ans
 
 
@@ -25,8 +24,11 @@ def single_test(q, a, b, test_name="Unknown test"):
         if not python_ans.success:
             print(test_name + ": correct", python_ans.success)
             return True
-        if (abs(python_ans.fun - my_ans.fun)) < 1e-7:
+        if (abs(python_ans.fun - my_ans.fun)) < 1e-7 and all(abs(python_ans.x - my_ans.x) < 1e-7):
             print(test_name + ": correct", python_ans.fun)
+            x = python_ans.x
+            for i in range(len(x)):
+                print("     x_%d = %.3f" % (i, x[i]))
             return True
         else:
             print(test_name + ": wrong")
