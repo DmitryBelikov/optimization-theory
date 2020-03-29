@@ -14,7 +14,6 @@ def vg_method(c, a, b):
 	while queue:
 		s = queue.pop(0)
 		res = linprog(s.c, A_ub=s.a, b_ub=s.b, method="simplex")
-		print('Optimal value:', res.fun, '\nX:', res.x)
 		if ans != None and ans.fun <= res.fun:
 			continue
 		found = False
