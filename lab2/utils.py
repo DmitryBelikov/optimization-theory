@@ -24,9 +24,9 @@ def single_test(q, a, b, test_name="Unknown test"):
         if not python_ans.success:
             print(test_name + ": correct", python_ans.success)
             return True
-        if (abs(python_ans.fun - my_ans.fun)) < 1e-7 and all(abs(python_ans.x - my_ans.x) < 1e-7):
+        if (abs(python_ans.fun - my_ans.fun)) < 1e-7:
             print(test_name + ": correct", python_ans.fun)
-            x = python_ans.x
+            x = my_ans.x
             for i in range(len(x)):
                 print("     x_%d = %.3f" % (i, x[i]))
             return True
@@ -42,7 +42,7 @@ def single_test(q, a, b, test_name="Unknown test"):
         return False
 
 
-def full_test():
+def full_test_simplex():
     q, a, b = variants_sample1()
     single_test(q, a, b, "sample1")
     q, a, b = variants_sample2()

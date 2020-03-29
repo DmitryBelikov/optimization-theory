@@ -7,6 +7,11 @@ class SimplexMethodResults:
         self.fun = fun
         self.x = x
 
+    def __str__(self):
+        return 'success: {}\n' \
+               'fun: {}\n' \
+               'x: {}\n'.format(self.success, self.fun, self.x)
+
 
 def check_if_basis(a, j):
     count = 0
@@ -16,14 +21,22 @@ def check_if_basis(a, j):
     return count == a.shape[0] - 1
 
 
+def simplex_method_ub(c, a, b):
+    a = np.hstack((np.array(a, np.float), np.eye(len(a))))
+    c = np.hstack((np.array(c, np.float), np.zeros(a.shape[0], np.float)))
+    res = simplex_method(c, a, b)
+    res.x = res.x[:-len(a)]
+    return res
+
+
 def simplex_method(c, a, b):
     a = np.hstack((np.array(a, np.float), np.eye(len(a))))
     c = np.hstack((np.array(c, np.float) * (-1), np.zeros(a.shape[0], np.float)))
     M = 10000.0
-    np.seterr(divide='ignore')
+    np.seterr(divide='ignore', invalid='ignore')
+    q0 = 0.0
     for i in range(0, len(a)):
         c[-i - 1] = -M
-    q0 = 0.0
     for i in range(0, a.shape[0]):
         c = c + a[i] * M
         q0 += b[i] * M
