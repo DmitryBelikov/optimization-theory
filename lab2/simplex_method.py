@@ -36,15 +36,14 @@ def simplex_method(c, a, b):
     np.seterr(divide='ignore', invalid='ignore')
     q0 = 0.0
     for i in range(0, len(a)):
-        a[-i - 1] *= np.sign(b[-i - 1])
-        b[-i - 1] *= np.sign(b[-i - 1])
+        if b[-i - 1] != 0:
+            a[-i - 1] *= np.sign(b[-i - 1])
+            b[-i - 1] *= np.sign(b[-i - 1])
     for i in range(0, len(a)):
         c[-i - 1] = -M
     for i in range(0, a.shape[0]):
         c = c + a[i] * M
         q0 += b[i] * M
-    for i in range(0, len(a)):
-        c[-i - 1] = 0
     b = np.array(b, np.float)
     basis = np.arange(a.shape[0]) + a.shape[1] - 2
     eps = 1e-12
