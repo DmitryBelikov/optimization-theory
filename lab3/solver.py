@@ -3,23 +3,24 @@ from scipy.optimize import linprog
 
 
 def solve_game(a: np.ndarray):
-    addition = (-(a.min(initial=0)) + 1)
+    addition = -a.min(initial=0) + 1
     a += addition
 
-    a = -a
-    c = np.array([1] * a.shape[0])
+    c = np.array([-1] * a.shape[0])
     b = np.array([-1] * a.shape[1])
-    solution_eps = linprog(c=c, A_ub=a, b_ub=b, method='simplex')
-    v = 1 / solution_eps.fun
-    xs = solution_eps.x * v
 
-    c = np.array([1] * a.shape[1])
-    b = np.array([-1] * a.shape[0])
-    a = a.T
+    results_x = linprog(c, A_ub=a.T, b_ub=b, method='simplex', bounds=(None, 0))
+    v = 1 / results_x.fun
 
-    solution_nuys = linprog(c=c, A_ub=a, b_ub=b, method='simplex')
-    u = 1 / solution_nuys.fun
-    ys = solution_nuys.x * u
+    xs = -results_x.x * v
+
+    b, c = c, b
+    b = -b
+
+    results_y = linprog(c, A_ub=a, b_ub=b, method='simplex')
+    u = -1 / results_y.fun
+
+    ys = results_y.x * u
 
     return v - addition, u - addition, xs, ys
 
