@@ -3,6 +3,20 @@ from scipy.optimize import linprog
 from lab2.simplex_method import simplex_method_ub
 
 
+def solve_game(a, b, c):
+    # result = linprog(c=c, A_ub=a, b_ub=b)
+    result = simplex_method_ub(c, a, b)
+    if not result.success:
+        raise ArithmeticError(getattr(result, "message", "Oops, Something went wrong"))
+
+    return result
+
+
+def print_results(result):
+    print("Guaranteed score: {:.6}".format(1 / np.sum(result)))
+    print("Optimal strategy:\n{}".format(result / np.sum(result)))
+
+
 def main():
     game = np.array([
         [1, 1, 1],
@@ -15,34 +29,26 @@ def main():
     n = game.shape[1]
     m = game.shape[0]
 
-    print("Game matrix:")
-    print(game)
+    print("Game matrix:\n{}".format(game))
 
-    # a = np.append(-game, -np.eye(m), axis=1).T
-    a = -game.T
-    print(a)
-
-    # b = np.append(-np.ones(n), np.zeros(m))
-    b = -np.ones(n)
-    print(b)
-
-    c = np.ones(m)
-    print(c)
-    result = linprog(c=c, A_ub=a, b_ub=b)
-    
-    print(result.success)
-    print(simplex_method_ub(c, a, b).x)
-
-    if not result.success:
-        print(result.message)
-    else:
-        print(result.x)
-
-
-    # print('First player guarantee: {}'.format(x_balance))
-    # print('Second player guarantee: {}'.format(y_balance))
-    # print('First player strategy: {}'.format(xs))
-    # print('Second player strategy: {}'.format(ys))
+    try:
+        a = -game.T
+        b = -np.ones(n)
+        c = np.ones(m)
+        result = solve_game(a, b, c)
+        print("\nPlayer 1 results:")
+        print_results(result.x)
+        
+        a = game
+        b = np.ones(m)
+        c = -np.ones(n)
+        result = solve_game(a, b, c)
+        print("\nPlayer 2 results:")
+        print_results(result.x)
+        
+    except ArithmeticError as e:
+        print(e)
+        return
 
 
 if __name__ == '__main__':
