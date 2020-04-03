@@ -4,9 +4,9 @@ from lab2.vetvei_granis import *
 
 
 def main():
-    q, a, b = variants_sample12()
-    pyres = vg_method_python(q, a, b)
-    myres = vg_method_my(q, a, b)
+    q, a, b = bad_not_antony()
+    pyres = python_simplex_method_ub(q, a, b)
+    myres = simplex_method_ub(q, a, b)
     if pyres.success == myres.success:
         if not pyres.success:
             print("False")
@@ -14,6 +14,8 @@ def main():
             print(pyres.x)
             print(myres.x)
     else:
+        print(pyres.x)
+        print(myres.x)
         print("Py ans != your ans")
 
 
