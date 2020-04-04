@@ -8,9 +8,11 @@ def python_simplex_method(q, a, b):
     ans = linprog(c=q, A_eq=a, b_eq=b, method="simplex")
     return ans
 
+
 def python_simplex_method_ub(q, a, b):
     ans = linprog(c=q, A_ub=a, b_ub=b, method="simplex")
     return ans
+
 
 def print_results(method_results, msg=""):
     print(msg)
