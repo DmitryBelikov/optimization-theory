@@ -40,21 +40,20 @@ def branch_n_bound(c, a, b, f):
     ans = SimplexMethodResults(False, 0, [])
     pos = 0
     while pos < len(order):
-        (cur_c, cur_a, cur_b) = order[pos]
+        cur_c, cur_a, cur_b = order[pos]
         pos += 1
         next_step = f(cur_c, cur_a, cur_b)
         for i in range(len(next_step.x)):
             next_step.x[i] = round(next_step.x[i], 7)
         next_step.fun = round(next_step.fun, 7)
-        if ans.success and ans.fun <= next_step.fun:
-            continue
         if not next_step.success:
             return next_step
-        children = get_children(cur_c, cur_a, cur_b, next_step)
-        if len(children) == 0:
-            if not ans.success or ans.fun >= next_step.fun:
-                ans = next_step
-        else:
-            for i in children:
-                order.append(i)
+        if not ans.success or next_step.fun <= ans.fun:
+            children = get_children(cur_c, cur_a, cur_b, next_step)
+            if len(children) == 0:
+                if not ans.success or ans.fun >= next_step.fun:
+                    ans = next_step
+            else:
+                for i in children:
+                    order.append(i)
     return ans
