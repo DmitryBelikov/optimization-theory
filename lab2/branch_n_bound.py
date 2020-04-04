@@ -1,5 +1,3 @@
-from scipy.optimize import linprog
-
 from lab2.simplex_method import simplex_method_ub, SimplexMethodResults
 from lab2.utils import python_simplex_method_ub
 import numpy as np

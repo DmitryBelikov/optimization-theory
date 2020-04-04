@@ -1,9 +1,4 @@
-import numpy as np
 from scipy.optimize import linprog
-
-from lab2.simplex_method import simplex_method, simplex_method_ub
-from lab2.utils import python_simplex_method_ub
-
 
 class LP:
     def __init__(self, a, b, c):

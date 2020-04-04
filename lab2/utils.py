@@ -47,7 +47,7 @@ def single_test(q, a, b, test_name="Unknown test"):
         return False
 
 
-def full_test_simplex():
+def full_test_simples():
     q, a, b = variants_sample1()
     single_test(q, a, b, "sample1")
     q, a, b = variants_sample2()

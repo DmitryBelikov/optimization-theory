@@ -11,6 +11,7 @@ def test(q, a, b):
     print(pyres.x, myres.x, nres.x)
     print(pyres.fun, myres.fun, nres.fun)
     print(pyres.success, myres.success, nres.success)
+    print()
 
 
 def main():
@@ -36,6 +37,10 @@ def main():
     test(q, a, b)
     q, a, b = variants_sample11()
     test(q, a, b)
+    q, a, b = variants_sample11()
+    test(q, a, b)
+    q, a, b = variants_sample12()
+    test(q, a, b)
 
     # q, a, b = bad_not_antony()
     # my = simplex_method_ub(q, a, b)
@@ -49,7 +54,7 @@ def main():
     # print(my.x, py.x)
     # print(my.fun, py.fun)
     # print(my.success, py.success)
-    # full_test_simplex()
+    # full_test_simples()
 
 
 if __name__ == '__main__':
