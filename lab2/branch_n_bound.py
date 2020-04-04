@@ -1,14 +1,7 @@
+from scipy.optimize import linprog
+
 from lab2.simplex_method import simplex_method_ub, SimplexMethodResults
-from lab2.utils import python_simplex_method_ub
 import numpy as np
-
-
-def bnb_method_my(c, a, b):
-    return branch_n_bound(c, a, b, lambda c, a, b: simplex_method_ub(c, a, b))
-
-
-def bnb_method_python(c, a, b):
-    return branch_n_bound(c, a, b, lambda c, a, b: python_simplex_method_ub(c, a, b))
 
 
 def add_constraint(old_a, old_b, idx, sign, b):
@@ -41,11 +34,12 @@ def branch_n_bound(c, a, b, f):
         cur_c, cur_a, cur_b = order[pos]
         pos += 1
         next_step = f(cur_c, cur_a, cur_b)
+        py_step = linprog(c=cur_c, A_ub=cur_a, b_ub=cur_b, method="simplex")
         for i in range(len(next_step.x)):
             next_step.x[i] = round(next_step.x[i], 7)
         next_step.fun = round(next_step.fun, 7)
         if not next_step.success:
-            return next_step
+            continue
         if not ans.success or next_step.fun <= ans.fun:
             children = get_children(cur_c, cur_a, cur_b, next_step)
             if len(children) == 0:

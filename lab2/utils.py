@@ -1,7 +1,16 @@
 from scipy.optimize import linprog
 
+from lab2.branch_n_bound import branch_n_bound
 from lab2.samples import *
-from lab2.simplex_method import simplex_method
+from lab2.simplex_method import simplex_method, simplex_method_ub
+
+
+def bnb_method_my(c, a, b):
+    return branch_n_bound(c, a, b, lambda c, a, b: simplex_method_ub(c, a, b))
+
+
+def bnb_method_python(c, a, b):
+    return branch_n_bound(c, a, b, lambda c, a, b: python_simplex_method_ub(c, a, b))
 
 
 def python_simplex_method(q, a, b):
@@ -30,7 +39,7 @@ def single_test(q, a, b, test_name="Unknown test"):
             print(test_name + ": correct", python_ans.success)
             return True
         if (abs(python_ans.fun - my_ans.fun)) < 1e-7:
-            print(test_name + ": correct", python_ans.fun)
+            print(test_name + ": correct.\n     fun =", python_ans.fun)
             x = my_ans.x
             for i in range(len(x)):
                 print("     x_%d = %.3f" % (i, x[i]))
@@ -47,7 +56,7 @@ def single_test(q, a, b, test_name="Unknown test"):
         return False
 
 
-def full_test_simples():
+def full_test_samples():
     q, a, b = variants_sample1()
     single_test(q, a, b, "sample1")
     q, a, b = variants_sample2()
@@ -72,3 +81,41 @@ def full_test_simples():
     single_test(q, a, b, "sample11")
     q, a, b = variants_sample12()
     single_test(q, a, b, "sample12")
+
+
+def test(q, a, b):
+    myres = bnb_method_my(q, a, b)
+    pyres = bnb_method_python(q, a, b)
+    print(pyres.x, myres.x)
+    print(pyres.fun, myres.fun)
+    print(pyres.success, myres.success)
+    print()
+
+
+def full_test_bnb():
+    q, a, b = variants_sample1()
+    test(q, a, b)
+    q, a, b = variants_sample2()
+    test(q, a, b)
+    q, a, b = variants_sample3()
+    test(q, a, b)
+    q, a, b = variants_sample4()
+    test(q, a, b)
+    q, a, b = variants_sample5()
+    test(q, a, b)
+    q, a, b = variants_sample6()
+    test(q, a, b)
+    q, a, b = variants_sample7()
+    test(q, a, b)
+    q, a, b = variants_sample8()
+    test(q, a, b)
+    q, a, b = variants_sample9()
+    test(q, a, b)
+    q, a, b = variants_sample10()
+    test(q, a, b)
+    q, a, b = variants_sample11()
+    test(q, a, b)
+    q, a, b = variants_sample11()
+    test(q, a, b)
+    q, a, b = variants_sample12()
+    test(q, a, b)

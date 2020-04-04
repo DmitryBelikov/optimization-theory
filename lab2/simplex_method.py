@@ -38,7 +38,7 @@ def simplex_method(c, a, b):
     c = c.copy()
     a = np.hstack((np.array(a, np.float), -np.eye(len(a))))
     c = np.hstack((np.array(c, np.float) * (-1), np.zeros(a.shape[0], np.float)))
-    M = 1000.0
+    M = 100000.0
     np.seterr(divide='ignore', invalid='ignore')
     q0 = 0.0
     for i in range(0, len(a)):
@@ -51,7 +51,7 @@ def simplex_method(c, a, b):
         c = c + a[i] * M
         q0 += b[i] * M
     b_ = np.array(b, np.float)
-    basis = np.arange(a.shape[0]) + a.shape[1] - 2
+    basis = np.arange(a.shape[0]) + a.shape[0] - 1
     eps = 1e-12
     while not all(c <= eps):
         max_c = np.amax(c)
@@ -81,10 +81,14 @@ def simplex_method(c, a, b):
         c = c + a[r] * multiplier
         q0 = q0 + b_[r] * multiplier
     res = any(basis > a.shape[1] - a.shape[0] - 1)
-    if q0 > M:
-        res = True
+    if q0 > 100000 / 10:
+        return SimplexMethodResults(False, q0, [])
     x = [0] * (a.shape[1] - a.shape[0])
-    if not res:
-        for i in range(a.shape[0]):
+    # if not res:
+    for i in range(a.shape[0]):
+        if basis[i] > a.shape[1] - a.shape[0] - 1:
+            if b_[i] / a[i][basis[i]] > 1e-8:
+                SimplexMethodResults(False, q0, x)
+        else:
             x[basis[i]] = b_[i] / a[i][basis[i]]
-    return SimplexMethodResults(not res, q0, x)
+    return SimplexMethodResults(True, q0, x)
