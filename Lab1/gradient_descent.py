@@ -11,8 +11,8 @@ def stop_criterion(grad, w, w0, eps):
     return norm
 
 
-def gradient_descent(func, grad, w0):
-    step_selector = GradientStepSelector(BisectionSearcher, func, grad, 1e-10)
+def gradient_descent(func, grad, w0, searcher=BisectionSearcher):
+    step_selector = GradientStepSelector(searcher, func, grad, 1e-10)
     w0 = np.array(w0.copy(), np.float64)
     w = np.array(w0.copy(), np.float64)
     while not stop_criterion(grad, w, w0, 1e-10):

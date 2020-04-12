@@ -19,6 +19,7 @@ class Searcher:
         plt.show()
 
 
+# тут написано говно
 class LinearSearcher(Searcher):
     def __init__(self, func, grad):
         super().__init__(func, grad)
@@ -54,6 +55,29 @@ class BisectionSearcher(Searcher):
                 return a, b
         return a, b
 
+
+class GoldenRatioSearcher(Searcher):
+    def __init__(self, func, grad):
+        super().__init__(func, grad)
+        self.ratio = 0.618
+
+    def search(self, a, b, eps):
+        temp_l = a + (1 - self.ratio) * (b - a)
+        temp_r = a + self.ratio * (b - a)
+        while abs(b - a) > eps:
+            if self.func(temp_l) > self.func(temp_r):
+                a = temp_l
+                b = b
+                temp_l = temp_r
+                temp_r = a + self.ratio * (b - a)
+            elif self.func(temp_l) < self.func(temp_r):
+                a = a
+                b = temp_r
+                temp_r = temp_l
+                temp_l = a + (1 - self.ratio) * (b - a)
+            else:
+                return a, b
+        return a, b
 # def fibonacci(a, b, eps):
 #     fib = [0.0, 1.0]
 #     while fib[-1] <= (b - a) / eps:
