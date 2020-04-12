@@ -19,21 +19,24 @@ class Searcher:
         plt.show()
 
 
-# тут написано говно
 class LinearSearcher(Searcher):
     def __init__(self, func, grad):
         super().__init__(func, grad)
         self.step = 2.0
-        self.delta = 0.001
+        self.delta = 1e-3
 
-    def search(self, a, b=0, eps=0.001):
+    def search(self, a, b=0, eps=0):
         start_value = self.func(a)
-        right_border = a + self.delta
+        right_step = self.func(a + self.delta)
+        direction = -np.sign(right_step - start_value)
+        last_value = start_value
         cur_delta = self.delta
-        while self.func(right_border) <= start_value + eps:
+        cur_x = a + self.delta * direction
+        while last_value > self.func(cur_x):
+            last_value = self.func(cur_x)
+            cur_x += cur_delta * direction
             cur_delta *= self.step
-            right_border += cur_delta
-        return 0, right_border
+        return min(a, cur_x), max(a, cur_x)
 
 
 class BisectionSearcher(Searcher):

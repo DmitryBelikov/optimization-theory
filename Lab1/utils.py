@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-from Lab1.methods import Searcher
+from Lab1.methods import Searcher, LinearSearcher
 
 
 def f1(x: np.ndarray):
@@ -30,7 +30,8 @@ class GradientStepSelector:
         self.eps = eps
 
     def get_step(self, x, d):
-        right_border = 1000  # ?????????
+        linear = LinearSearcher(lambda a: self.func(x - a * d), lambda a: self.grad(x - a * d))
+        _, right_border = linear.search(0, 0, 0)
         searcher = self.searcher_builder(lambda a: self.func(x - a * d), lambda a: self.grad(x - a * d))
         l, r = searcher.search(0, right_border, self.eps)
         return (l + r) / 2

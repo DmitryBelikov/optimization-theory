@@ -5,7 +5,7 @@ from Lab1.utils import *
 
 def main():
     a, b = (-2, 1)
-    searcher = GoldenRatioSearcher(f1, f1_grad)
+    searcher = BisectionSearcher(f1, f1_grad)
     searcher.draw_function(a, b)
     print(searcher.search(a, b, 0.001))
     print(gradient_descent(f1, f1_grad, [-1], GoldenRatioSearcher))
