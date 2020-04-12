@@ -5,12 +5,16 @@ import numpy as np
 
 
 class Searcher:
-    def __init__(self, func, grad):
+    def __init__(self, func):
         self.func = func
-        self.grad = grad
+        self.iterations = -1
+        self.function_calls = -1
 
     @abstractmethod
-    def search(self, a, b, eps): raise NotImplemented
+    def search(self, a, b, eps) -> (np.float64, np.float64): raise NotImplemented
+
+    @abstractmethod
+    def __str__(self): raise NotImplemented
 
     def draw_function(self, a, b):
         x = np.linspace(a, b, 100)
@@ -20,67 +24,99 @@ class Searcher:
 
 
 class LinearSearcher(Searcher):
-    def __init__(self, func, grad):
-        super().__init__(func, grad)
+    def __init__(self, func):
+        super().__init__(func)
         self.step = 2.0
-        self.delta = 1e-3
 
-    def search(self, a, b=0, eps=0):
+    def __str__(self):
+        return "linear"
+
+    def search(self, a, b=0, eps=1e-18):
+        delta = eps
+        while self.func(a) == self.func(a + delta):
+            delta *= self.step
         start_value = self.func(a)
-        right_step = self.func(a + self.delta)
+        right_step = self.func(a + delta)
         direction = -np.sign(right_step - start_value)
         last_value = start_value
-        cur_delta = self.delta
-        cur_x = a + self.delta * direction
-        while last_value > self.func(cur_x):
-            last_value = self.func(cur_x)
+        cur_delta = delta
+        cur_x = a + delta * direction
+        self.iterations = 0
+        self.function_calls = 2
+        while True:
+            new_last_value = self.func(cur_x)
+            self.function_calls += 1
+            self.iterations += 1
+            if not last_value > new_last_value:
+                break
+            last_value = new_last_value
             cur_x += cur_delta * direction
             cur_delta *= self.step
-        return min(a, cur_x), max(a, cur_x)
+        return min(a, cur_x), max(a, cur_x), self.iterations, self.function_calls
 
 
 class BisectionSearcher(Searcher):
-    def __init__(self, func, grad):
-        super().__init__(func, grad)
+    def __init__(self, func):
+        super().__init__(func)
+
+    def __str__(self):
+        return "bisection"
 
     def search(self, a, b, eps):
         delta = eps / 4
+        self.iterations = 0
+        self.function_calls = 0
         while abs(a - b) > eps:
-            ml = (a + b) / 2 - delta
-            mr = (a + b) / 2 + delta
-            if self.func(ml) > self.func(mr):
+            ml = (a + b - 2 * delta) / 2
+            mr = (a + b + 2 * delta) / 2
+            f_ml = self.func(ml)
+            f_mr = self.func(mr)
+            self.function_calls += 2
+            self.iterations += 1
+            if f_ml > f_mr:
                 a = ml
                 b = b
-            elif self.func(ml) < self.func(mr):
+            elif f_ml < f_mr:
                 a = a
                 b = mr
             else:
-                return a, b
-        return a, b
+                a = ml
+                b = mr
+                return a, b, self.iterations, self.function_calls
+        return a, b, self.iterations, self.function_calls
 
 
 class GoldenRatioSearcher(Searcher):
-    def __init__(self, func, grad):
-        super().__init__(func, grad)
+    def __init__(self, func):
+        super().__init__(func)
         self.ratio = 0.618
+
+    def __str__(self):
+        return "golden ratio"
 
     def search(self, a, b, eps):
         temp_l = a + (1 - self.ratio) * (b - a)
         temp_r = a + self.ratio * (b - a)
+        self.iterations = 0
+        self.function_calls = 0
         while abs(b - a) > eps:
-            if self.func(temp_l) > self.func(temp_r):
+            f_temp_l = self.func(temp_l)
+            f_temp_r = self.func(temp_r)
+            self.function_calls += 2
+            self.iterations += 1
+            if f_temp_l > f_temp_r:
                 a = temp_l
                 b = b
                 temp_l = temp_r
                 temp_r = a + self.ratio * (b - a)
-            elif self.func(temp_l) < self.func(temp_r):
+            elif f_temp_l < f_temp_r:
                 a = a
                 b = temp_r
                 temp_r = temp_l
                 temp_l = a + (1 - self.ratio) * (b - a)
             else:
-                return a, b
-        return a, b
+                return a, b, self.iterations, self.function_calls
+        return a, b, self.iterations, self.function_calls
 # def fibonacci(a, b, eps):
 #     fib = [0.0, 1.0]
 #     while fib[-1] <= (b - a) / eps:

@@ -4,11 +4,13 @@ from Lab1.utils import *
 
 
 def main():
-    a, b = (-2, 1)
-    searcher = BisectionSearcher(f1, f1_grad)
+    a = -10
+    b = 10
+    searcher = BisectionSearcher(f1)
     searcher.draw_function(a, b)
-    print(searcher.search(a, b, 0.001))
-    print(gradient_descent(f1, f1_grad, [-1], GoldenRatioSearcher))
+    l, r, iterations, function_calls = searcher.search(a, b, 0.001)
+    print(l, r)
+    build_plots_for_all_searchers(f1, a, b, [2 ** x for x in range(-1, -20, -1)])
 
 
 if __name__ == '__main__':

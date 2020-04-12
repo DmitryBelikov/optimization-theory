@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-from Lab1.methods import Searcher, LinearSearcher
+from Lab1.methods import *
 
 
 def f1(x: np.ndarray):
@@ -22,16 +22,49 @@ def f2_grad(x):
     return -4 * x - 5
 
 
-class GradientStepSelector:
-    def __init__(self, searcher_builder, func, grad, eps):
-        self.searcher_builder = searcher_builder
-        self.func = func
-        self.grad = grad
-        self.eps = eps
+class PlotBuilder:
+    def __init__(self, a, b, epses):
+        self.a = a
+        self.b = b
+        self.epses = np.array(epses)
+        self.data = []
 
-    def get_step(self, x, d):
-        linear = LinearSearcher(lambda a: self.func(x - a * d), lambda a: self.grad(x - a * d))
-        _, right_border = linear.search(0, 0, 0)
-        searcher = self.searcher_builder(lambda a: self.func(x - a * d), lambda a: self.grad(x - a * d))
-        l, r = searcher.search(0, right_border, self.eps)
-        return (l + r) / 2
+    def add_searcher(self, searcher):
+        iterations_axes = []
+        function_calls_axes = []
+        for eps in self.epses:
+            l, r, iterations, function_calls = searcher.search(self.a, self.b, eps)
+            print(l, r)
+            iterations_axes.append(iterations)
+            function_calls_axes.append(function_calls)
+        self.data.append((iterations_axes, function_calls_axes, str(searcher)))
+
+    def show(self):
+        x_axes_range = np.array(range(len(self.epses)))
+        idx = [0, int(len(x_axes_range) / 2), -1]
+        plt.clf()
+        for iterations, function_calls, name in self.data:
+            plt.plot(x_axes_range, iterations, label=name)
+        plt.legend()
+        plt.xlabel("eps")
+        plt.xticks(x_axes_range[idx],
+                   self.epses[idx])
+        plt.ylabel("iterations")
+        plt.show()
+        plt.clf()
+        for iterations, function_calls, name in self.data:
+            plt.plot(x_axes_range, function_calls, label=name)
+        plt.legend()
+        plt.xlabel("eps")
+        plt.xticks(x_axes_range[idx],
+                   self.epses[idx])
+        plt.ylabel("function calls")
+        plt.show()
+
+
+def build_plots_for_all_searchers(func, a, b, epses):
+    plots = PlotBuilder(a, b, epses)
+    plots.add_searcher(LinearSearcher(func))
+    plots.add_searcher(BisectionSearcher(func))
+    plots.add_searcher(GoldenRatioSearcher(func))
+    plots.show()
