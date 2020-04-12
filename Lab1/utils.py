@@ -22,6 +22,16 @@ def f2_grad(x):
     return -4 * x - 5
 
 
+def f3(x: np.ndarray):
+    f = 2 * x ** 2 + x * 5 - 13 + np.array([x[0], x[1] ** 2, 0, 0])
+    return f
+
+
+def f3_grad(x: np.ndarray):
+    f = 4 * x + 5 + np.array([1, 2 * x[1], 0, 0])
+    return f
+
+
 class PlotBuilder:
     def __init__(self, a, b, epses):
         self.a = a
@@ -34,7 +44,6 @@ class PlotBuilder:
         function_calls_axes = []
         for eps in self.epses:
             l, r, iterations, function_calls = searcher.search(self.a, self.b, eps)
-            print(l, r)
             iterations_axes.append(iterations)
             function_calls_axes.append(function_calls)
         self.data.append((iterations_axes, function_calls_axes, str(searcher)))
@@ -67,4 +76,5 @@ def build_plots_for_all_searchers(func, a, b, epses):
     plots.add_searcher(LinearSearcher(func))
     plots.add_searcher(BisectionSearcher(func))
     plots.add_searcher(GoldenRatioSearcher(func))
+    plots.add_searcher(FibonacciSearcher(func))
     plots.show()
