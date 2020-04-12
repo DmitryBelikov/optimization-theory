@@ -1,8 +1,14 @@
-from Lab1.methods import fibonacci
+from Lab1.gradient_descent import gradient_descent
+from Lab1.methods import *
+from Lab1.utils import *
 
 
 def main():
-    print(fibonacci(0, 2, 0.001))
+    a, b = (-2, 1)
+    searcher = LinearSearcher(f1, f1_grad)
+    searcher.draw_function(a, b)
+    print(searcher.search(a, b, 0.001))
+    print(gradient_descent(f1, f1_grad, [-1]))
 
 
 if __name__ == '__main__':
