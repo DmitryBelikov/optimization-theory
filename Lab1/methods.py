@@ -31,52 +31,44 @@ class LinearSearcher(Searcher):
     def __str__(self):
         return "linear"
 
-    # def search(self, a, b=0, eps=1e-18):
-    #     a = np.array(a)
-    #     b = np.array(b)
-    #     delta = eps
-    #     while not (all(self.func(a) > self.func(a + delta)) or all(self.func(a) > self.func(a + delta))):
-    #         delta *= self.step
-    #     start_value = self.func(a)
-    #     right_step = self.func(a + delta)
-    #     direction = -np.sign(right_step - start_value)
-    #     last_value = start_value
-    #     cur_delta = delta
-    #     cur_x = a + delta * direction
-    #     self.iterations = 0
-    #     self.function_calls = 2
-    #     while True:
-    #         self.function_calls += 1
-    #         self.iterations += 1
-    #         if not all(last_value >= new_last_value):
-    #             break
-    #         last_value = new_last_value
-    #         cur_x += cur_delta * direction
-    #         cur_delta *= self.step
-    #     if all(a < cur_x):
-    #         return a, cur_x, self.iterations, self.function_calls
-    #     else:
-    #         return cur_x, a, self.iterations, self.function_calls
+    def search(self, a, b=0, eps=1e-18):
+        a = np.array(a)
+        b = np.array(b)
+        delta = eps
+        start_value = self.func(a)
+        right_step = self.func(a + delta)
+        while start_value == right_step:
+            delta *= self.step
+            right_step = self.func(a + delta)
+        direction = -np.sign(right_step - start_value)
+        last_value = start_value
+        cur_delta = delta
+        cur_x = a + delta * direction
+        self.iterations = 0
+        self.function_calls = 2
+        while True:
+            new_last_value = self.func(cur_x)
+            self.function_calls += 1
+            self.iterations += 1
+            if last_value < new_last_value:
+                break
+            last_value = new_last_value
+            cur_x += cur_delta * direction
+            cur_delta *= self.step
+        if a < cur_x:
+            return a, cur_x, self.iterations, self.function_calls
+        else:
+            return cur_x, a, self.iterations, self.function_calls
     # def search(self, a, b=0, eps=1e-18):
     #     a = np.array(a)
     #     b = np.array(b)
     #     start_value = self.func(a)
     #     right_border = a + eps
     #     cur_delta = eps
-    #     while all(self.func(right_border) <= start_value + eps):
+    #     while self.func(right_border) <= start_value + eps:
     #         cur_delta *= 2
     #         right_border += cur_delta
     #     return 0, right_border, 0, 0
-    def search(self, a, b=0, eps=1e-18):
-        a = np.array(a)
-        b = np.array(b)
-        start_value = self.func(a)
-        right_border = a + eps
-        cur_delta = eps
-        while all(self.func(right_border) <= start_value + eps):
-            cur_delta *= 2
-            right_border += cur_delta
-        return 0, right_border, 0, 0
 
 
 class BisectionSearcher(Searcher):
@@ -92,17 +84,17 @@ class BisectionSearcher(Searcher):
         delta = eps / 4
         self.iterations = 0
         self.function_calls = 0
-        while all(abs(a - b) > eps):
+        while np.linalg.norm(a - b) > eps:
             ml = (a + b - 2 * delta) / 2
             mr = (a + b + 2 * delta) / 2
             f_ml = self.func(ml)
             f_mr = self.func(mr)
             self.function_calls += 2
             self.iterations += 1
-            if all(f_ml > f_mr):
+            if f_ml > f_mr:
                 a = ml
                 b = b
-            elif all(f_ml < f_mr):
+            elif f_ml < f_mr:
                 a = a
                 b = mr
             else:
@@ -127,17 +119,17 @@ class GoldenRatioSearcher(Searcher):
         temp_r = a + self.ratio * (b - a)
         self.iterations = 0
         self.function_calls = 0
-        while all(abs(b - a) > eps):
+        while np.linalg.norm(b - a) > eps:
             f_temp_l = self.func(temp_l)
             f_temp_r = self.func(temp_r)
             self.function_calls += 2
             self.iterations += 1
-            if all(f_temp_l > f_temp_r):
+            if f_temp_l > f_temp_r:
                 a = temp_l
                 b = b
                 temp_l = temp_r
                 temp_r = a + self.ratio * (b - a)
-            elif all(f_temp_l < f_temp_r):
+            elif f_temp_l < f_temp_r:
                 a = a
                 b = temp_r
                 temp_r = temp_l
@@ -153,7 +145,7 @@ class FibonacciSearcher(Searcher):
     def __init__(self, func):
         super().__init__(func)
         if FibonacciSearcher.fib is None:
-            FibonacciSearcher.fib = [np.array([1]), np.array([1])]
+            FibonacciSearcher.fib = [1, 1]
             for i in range(2, 1000):
                 FibonacciSearcher.fib.append(FibonacciSearcher.fib[-1] + FibonacciSearcher.fib[-2])
         self.gamma = 1e-15
@@ -167,7 +159,7 @@ class FibonacciSearcher(Searcher):
         n = 0
         fib = FibonacciSearcher.fib
         # eps = max(1e-3, eps)
-        while all(fib[n] < np.linalg.norm(b - a) / eps):
+        while fib[n] < np.linalg.norm(b - a) / eps:
             n += 1
         temp_l = a + fib[n - 2] / fib[n] * (b - a)
         temp_r = a + fib[n - 1] / fib[n] * (b - a)
@@ -180,7 +172,7 @@ class FibonacciSearcher(Searcher):
             f_temp_r = self.func(temp_r)
             self.function_calls += 2
             self.iterations += 1
-            if all(f_temp_l > f_temp_r):
+            if f_temp_l > f_temp_r:
                 a = temp_l
                 b = b
                 temp_l = temp_r
@@ -193,7 +185,7 @@ class FibonacciSearcher(Searcher):
         temp_l = temp_l
         temp_r = temp_l + self.gamma
         self.function_calls += 2
-        if all(self.func(temp_l) == self.func(temp_r)):
+        if self.func(temp_l) == self.func(temp_r):
             a = temp_l
             b = b
         else:

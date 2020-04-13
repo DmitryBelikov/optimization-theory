@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
+from Lab1.gradient_descent import gradient_descent
 from Lab1.methods import *
 
 
@@ -23,12 +24,18 @@ def f2_grad(x):
 
 
 def f3(x: np.ndarray):
-    f = 2 * x ** 2 + x * 5 - 13 + np.array([x[0], x[1] ** 2, 0, 0])
+    f = (x[0] - 2) ** 2 + (x[1] - 1) ** 2
     return f
 
 
+def test_function_gradient(xs):
+    return np.array([[2 * (xs[0][0] - 2),
+                      2 * (xs[0][1] - 1)]])
+
+
 def f3_grad(x: np.ndarray):
-    f = 4 * x + 5 + np.array([1, 2 * x[1], 0, 0])
+    f = [2 * (x[0] - 2),
+         2 * (x[1] - 1)]
     return f
 
 
@@ -78,3 +85,34 @@ def build_plots_for_all_searchers(func, a, b, epses):
     plots.add_searcher(GoldenRatioSearcher(func))
     plots.add_searcher(FibonacciSearcher(func))
     plots.show()
+
+
+def draw_single_arg_function(func, a, b):
+    x = np.linspace(a, b, 100)
+    plt.xticks(np.arange(a, b, 0.20))
+    plt.plot(x, np.vectorize(func)(x))
+    plt.show()
+
+
+def draw_double_arg_function(func, x1, y1, x2, y2):
+    x_step = 0.1
+    y_step = 0.1
+    x_s = np.arange(x1, x2, x_step)
+    y_s = np.arange(y1, y2, y_step)
+    z_s = []
+    for y in y_s:
+        tmp = []
+        for x in x_s:
+            tmp.append(func(np.array([x, y])))
+        z_s.append(tmp)
+    z_s = np.array(z_s)
+    plt.figure()
+    cs = plt.contour(x_s, y_s, z_s, levels=2000)
+    plt.show()
+
+
+def run_all_gradients(f, g, start):
+    # print("LinearStepSearch", gradient_descent(f, g, start, 1e-9, None))
+    print("BisectionSearcher", gradient_descent(f, g, start, 1e-9, BisectionSearcher))
+    print("GoldenRatioSearcher", gradient_descent(f, g, start, 1e-9, GoldenRatioSearcher))
+    print("FibonacciSearcher", gradient_descent(f, g, start, 1e-9, FibonacciSearcher))
