@@ -12,8 +12,11 @@ def main():
     # print(l, r)
     # build_plots_for_all_searchers(f1, a, b, [2 ** x for x in range(-1, -20, -1)])
     # run_all_gradients(f1, f1_grad, [-100])
-    run_all_gradients(f3, f3_grad, [-2, 51])
-    # draw_double_arg_function(f3, -5, -5, 5, 5)
+    start = [185, -993]
+    eps = 1e-18
+    run_all_gradients(f3, f3_grad, start, eps)
+    # draw_double_arg_function(f3, res[0] - 10, res[1] - 10, res[0] + 10, res[1] + 10)
+    draw_descent_steps(f3, f3_grad, start, BisectionSearcher, eps)
     # print("LinearStepSearch", gradient_descent(f3, f3_grad, [-2, 51], 1e-9, None))
 
 

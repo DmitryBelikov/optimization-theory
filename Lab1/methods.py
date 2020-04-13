@@ -37,6 +37,8 @@ class LinearSearcher(Searcher):
         delta = eps
         start_value = self.func(a)
         right_step = self.func(a + delta)
+        if start_value == right_step:
+            print("Bad epsilon for linear search!!!")
         while start_value == right_step:
             delta *= self.step
             right_step = self.func(a + delta)

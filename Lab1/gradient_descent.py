@@ -34,7 +34,7 @@ class GradientStepSelector:
         l, r, _, _ = searcher.search(0, right_border, self.eps)
         result = (l + r) / 2
         if result > right_border:
-            assert False
+            return right_border
         else:
             return result
 
@@ -44,19 +44,16 @@ def gradient_descent(func, grad, w0, eps=1e-9, searcher=None):
     w0 = np.array(w0.copy(), np.float64)
     w = np.array(w0.copy(), np.float64)
     iterations = 0
+    path = [w0]
     while not stop_criterion(grad, w, w0, eps):
-        # print("w =", w)
         gradient_value = np.array(grad(w))
         alpha = step_selector.get_step(w)
-        # print("alpha =", alpha)
-        # print("gradient =", gradient_value)
         delta_w = alpha * gradient_value
         w -= delta_w
+        path.append(w)
         iterations += 1
         if alpha < 1e-20:
             print("Alpha = 0")
             break
-        # if iterations > 10:
-        #     exit(9)
-    return w, iterations
+    return w, iterations, path
 # [-1.5        -0.83966064 -1.25       -1.25      ]
