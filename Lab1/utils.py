@@ -70,6 +70,7 @@ class PlotBuilder:
         plt.xticks(x_axes_range[idx],
                    self.epses[idx])
         plt.ylabel("iterations")
+        plt.title("Amount of iterations")
         plt.show()
         plt.clf()
         for iterations, function_calls, name in self.data:
@@ -79,21 +80,21 @@ class PlotBuilder:
         plt.xticks(x_axes_range[idx],
                    self.epses[idx])
         plt.ylabel("function calls")
+        plt.title("Amount of function calls")
         plt.show()
 
 
 def build_plots_for_all_searchers(func, a, b, epses):
     plots = PlotBuilder(a, b, epses)
-    plots.add_searcher(LinearSearcher(func))
-    plots.add_searcher(BisectionSearcher(func))
-    plots.add_searcher(GoldenRatioSearcher(func))
     plots.add_searcher(FibonacciSearcher(func))
+    plots.add_searcher(GoldenRatioSearcher(func))
+    plots.add_searcher(BisectionSearcher(func))
+    plots.add_searcher(LinearSearcher(func))
     plots.show()
 
 
 def draw_single_arg_function(func, a, b):
     x = np.linspace(a, b, 100)
-    plt.xticks(np.arange(a, b, 0.20))
     plt.plot(x, np.vectorize(func)(x))
     plt.show()
 
@@ -134,7 +135,9 @@ def draw_descent_steps(func, grad, start, searcher, eps, color="white", show=Fal
         draw_double_arg_function(func, xlims, ylims)
     plt.xlim(xlims[0], xlims[1])
     plt.ylim(ylims[0], ylims[1])
-
+    plt.xlabel("X")
+    plt.ylabel("Y")
+    plt.title("Gradient descent steps")
     prev_step = None
     for step in path:
         if prev_step is not None:
@@ -150,7 +153,7 @@ def draw_descent_steps(func, grad, start, searcher, eps, color="white", show=Fal
 
 
 def draw_all_descent_steps(func, grad, start, eps, single=True):
-    if (single):
+    if single:
         start = np.array(start)
         res, it, path = gradient_descent(func, grad, start, eps, None)
         distance = np.linalg.norm(start - res)
@@ -177,11 +180,30 @@ def draw_all_descent_steps(func, grad, start, eps, single=True):
 
 def run_all_gradients(f, g, start, eps):
     res, it, _ = gradient_descent(f, g, start, eps, None)
-    print("LinearStepSearch", (res, it))
+    print("LinearStepSearch\n    ans =", list(res), "\n    amount of iterations =", it)
     res_, it, _ = gradient_descent(f, g, start, eps, BisectionSearcher)
-    print("BisectionSearcher", (res_, it))
+    print("BisectionSearcher\n    ans =", list(res_), "\n    amount of iterations =", it)
     res_, it, _ = gradient_descent(f, g, start, eps, GoldenRatioSearcher)
-    print("GoldenRatioSearcher", (res_, it))
+    print("GoldenRatioSearcher\n    ans =", list(res_), "\n    amount of iterations =", it)
     res_, it, _ = gradient_descent(f, g, start, eps, FibonacciSearcher)
-    print("FibonacciSearcher", (res_, it))
+    print("FibonacciSearcher\n    ans =", list(res_), "\n    amount of iterations =", it)
     return res
+
+
+def task1():
+    a = -100
+    b = 100
+    draw_single_arg_function(f1, a, b)
+    build_plots_for_all_searchers(f1, a, b, [2 ** x for x in range(-1, -20, -1)])
+
+
+def task2():
+    start = [-23, 86]
+    eps = 1e-18
+    run_all_gradients(f3, f3_grad, start, eps)
+
+
+def task6():
+    start = [25, -40]
+    eps = 1e-18
+    draw_all_descent_steps(f3, f3_grad, start, eps, False)

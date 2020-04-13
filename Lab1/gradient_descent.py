@@ -53,7 +53,7 @@ def gradient_descent(func, grad, w0, eps=1e-9, searcher=None):
         path.append(w.copy())
         iterations += 1
         if alpha < 1e-20:
-            print("Alpha = 0")
+            # print("Alpha = 0")
             break
     return w, iterations, path
 # [-1.5        -0.83966064 -1.25       -1.25      ]
