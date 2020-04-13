@@ -35,6 +35,14 @@ def f3_grad(x: np.ndarray):
     return f
 
 
+def f4(x: np.ndarray):
+    return 3 * (x[0] + 1) ** 2 + (x[1] - 1) ** 2
+
+
+def f4_grad(x: np.ndarray):
+    return [6 * (x[0] + 1), 2 * (x[1] - 1)]
+
+
 class PlotBuilder:
     def __init__(self, a, b, epses):
         self.a = a
@@ -90,11 +98,11 @@ def draw_single_arg_function(func, a, b):
     plt.show()
 
 
-def draw_double_arg_function(func, x1, y1, x2, y2, show=False):
+def draw_double_arg_function(func, xlims, ylims, show=False):
     x_step = 0.1
     y_step = 0.1
-    x_s = np.arange(x1, x2, x_step)
-    y_s = np.arange(y1, y2, y_step)
+    x_s = np.arange(xlims[0], xlims[1], x_step)
+    y_s = np.arange(ylims[0], ylims[1], y_step)
     z_s = []
     for y in y_s:
         tmp = []
@@ -104,24 +112,67 @@ def draw_double_arg_function(func, x1, y1, x2, y2, show=False):
     z_s = np.array(z_s)
     plt.clf()
     plt.figure()
-    Locator.MAXTICKS = 3000
     cs = plt.imshow(z_s, interpolation='bilinear', cmap=plt.get_cmap("twilight"),
-                    origin='lower', extent=[x1, x2, y1, y2],
+                    origin='lower', extent=[xlims[0], xlims[1], ylims[0], ylims[1]],
                     vmax=abs(z_s).max(), vmin=-abs(z_s).max())
     if show:
         plt.show()
 
 
-def draw_descent_steps(func, grad, start, searcher, eps):
+def draw_descent_steps(func, grad, start, searcher, eps, color="white", show=False, name=""):
     res, it, path = gradient_descent(func, grad, start, eps, searcher)
-    dist = path - res
-    print(dist)
-    print(len(path), it)
-    # draw_double_arg_function(func, res[0] - dist, res[1] - dist, res[0] + dist, res[1] + dist)
-    # print(path)
-    # for step in path:
-    #     plt.scatter(step[0], step[1], c="white", )
-    # plt.show()
+    # diff = path - res
+    # dist = []
+    # for i in diff:
+    #     dist.append(np.linalg.norm(i))
+    # distance = np.average(dist)
+    # print(distance)
+    distance = np.linalg.norm(start - res)
+    xlims = (res[0] - distance, res[0] + distance)
+    ylims = (res[1] - distance, res[1] + distance)
+    if show:
+        draw_double_arg_function(func, xlims, ylims)
+    plt.xlim(xlims[0], xlims[1])
+    plt.ylim(ylims[0], ylims[1])
+
+    prev_step = None
+    for step in path:
+        if prev_step is not None:
+            plt.plot([prev_step[0], step[0]],
+                     [prev_step[1], step[1]], linewidth=1, c=color)
+            plt.scatter(step[0], step[1], c=color, s=3)
+        else:
+            plt.scatter(step[0], step[1], c=color, s=3, label=name)
+        prev_step = step
+    if show:
+        plt.legend()
+        plt.show()
+
+
+def draw_all_descent_steps(func, grad, start, eps, single=True):
+    if (single):
+        start = np.array(start)
+        res, it, path = gradient_descent(func, grad, start, eps, None)
+        distance = np.linalg.norm(start - res)
+        xlims = (res[0] - distance, res[0] + distance)
+        ylims = (res[1] - distance, res[1] + distance)
+        draw_double_arg_function(func, xlims, ylims)
+        delta = 1
+        draw_descent_steps(func, grad, start, None, eps, "white", False, "LinearSearcher")
+        draw_descent_steps(func, grad, start + [delta, 0], BisectionSearcher, eps, "red", False, "BisectionSearcher")
+        draw_descent_steps(func, grad, start + [2 * delta, 0], GoldenRatioSearcher, eps, "green", False,
+                           "GoldenRatioSearcher")
+        draw_descent_steps(func, grad, start + [3 * delta, 0], FibonacciSearcher, eps, "blue", False,
+                           "FibonacciSearcher")
+        plt.legend()
+        plt.show()
+    else:
+        draw_descent_steps(func, grad, start, None, eps, "white", True, "LinearSearcher")
+        draw_descent_steps(func, grad, start, BisectionSearcher, eps, "red", True, "BisectionSearcher")
+        draw_descent_steps(func, grad, start, GoldenRatioSearcher, eps, "green", True,
+                           "GoldenRatioSearcher")
+        draw_descent_steps(func, grad, start, FibonacciSearcher, eps, "blue", True,
+                           "FibonacciSearcher")
 
 
 def run_all_gradients(f, g, start, eps):

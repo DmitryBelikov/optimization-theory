@@ -50,7 +50,7 @@ def gradient_descent(func, grad, w0, eps=1e-9, searcher=None):
         alpha = step_selector.get_step(w)
         delta_w = alpha * gradient_value
         w -= delta_w
-        path.append(w)
+        path.append(w.copy())
         iterations += 1
         if alpha < 1e-20:
             print("Alpha = 0")
