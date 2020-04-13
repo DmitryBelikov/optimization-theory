@@ -73,7 +73,7 @@ class PlotBuilder:
 
 def build_plots_for_all_searchers(func, a, b, epses):
     plots = PlotBuilder(a, b, epses)
-    plots.add_searcher(LinearSearcher(func))
+    # plots.add_searcher(LinearSearcher(func))
     plots.add_searcher(BisectionSearcher(func))
     plots.add_searcher(GoldenRatioSearcher(func))
     plots.add_searcher(FibonacciSearcher(func))
