@@ -15,8 +15,8 @@ from Lab1.utils import *
 def main():
     # draw_descent_steps(f4, f4_grad, start, GoldenRatioSearcher, eps)
     # print("LinearStepSearch", gradient_descent(f3, f3_grad, [-2, 51], 1e-9, None))
-    task1()
-    task2()
+    # task1()
+    # task2()
     task6()
 
 
