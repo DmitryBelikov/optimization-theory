@@ -10,6 +10,11 @@ def stop_criterion(grad, w, w0, eps):
     return norm
 
 
+def stop_criterion_dx(grad, w, w0, eps):
+    norm = np.linalg.norm(w - w0)
+    return norm < 1e-10
+
+
 class GradientStepSelector:
     def __init__(self, func, grad, eps, searcher_builder=None):
         self.searcher_builder = searcher_builder
@@ -39,39 +44,49 @@ class GradientStepSelector:
             return result
 
 
-def gradient_descent(func, grad, w0, eps=1e-9, searcher=None):
+def gradient_descent(func, grad, w0, eps=1e-9, searcher=None, stop_criterion=stop_criterion_dx):
     step_selector = GradientStepSelector(func, grad, 1e-9, searcher)
     w0 = np.array(w0.copy(), np.float64)
     w = np.array(w0.copy(), np.float64)
     iterations = 0
     path = [w0]
-    while not stop_criterion(grad, w, w0, eps):
+    first = True
+    while first or not stop_criterion(grad, w, w0, eps):
+        first = False
         gradient_value = np.array(grad(w))
         alpha = step_selector.get_step(w)
         delta_w = alpha * gradient_value
+        w0 = w.copy()
         w -= delta_w
         path.append(w.copy())
         iterations += 1
         if alpha < 1e-20:
             # print("Alpha = 0")
             break
+        if iterations > 50:
+            break
     return w, iterations, path
 
 
-def const_gradient_descent(func, grad, w0, eps=1e-9, step=0.1):
+def const_gradient_descent(func, grad, w0, eps=1e-9, step=0.1, stop_criterion=stop_criterion_dx):
     w0 = np.array(w0.copy(), np.float64)
     w = np.array(w0.copy(), np.float64)
     iterations = 0
     path = [w0]
-    while not stop_criterion(grad, w, w0, eps):
+    first = True
+    while first or not stop_criterion(grad, w, w0, eps):
+        first = False
         gradient_value = np.array(grad(w))
         alpha = step
         delta_w = alpha * gradient_value
+        w0 = w.copy()
         w -= delta_w
         path.append(w.copy())
         iterations += 1
         # print(w)
         if alpha < 1e-20:
             # print("Alpha = 0")
+            break
+        if iterations > 50:
             break
     return w, iterations, path

@@ -133,6 +133,8 @@ def draw_single_arg_function(func, a, b):
 def draw_double_arg_function(func, xlims, ylims, show=False):
     x_step = 0.1
     y_step = 0.1
+    x_step = (xlims[1] - xlims[0]) / 100
+    y_step = (ylims[1] - ylims[0]) / 100
     x_s = np.arange(xlims[0], xlims[1], x_step)
     y_s = np.arange(ylims[0], ylims[1], y_step)
     z_s = []
@@ -179,7 +181,7 @@ def draw_descent_steps(func, grad, start, searcher, eps, color="white", show=Fal
 
 
 def draw_const_descent_steps(func, grad, start, eps, color="white", show=False, name=""):
-    res, it, path = const_gradient_descent(func, grad, start, eps, 0.5)
+    res, it, path = const_gradient_descent(func, grad, start, eps, 1e-2)
     distance = np.linalg.norm(start - res)
     xlims = (res[0] - distance, res[0] + distance)
     ylims = (res[1] - distance, res[1] + distance)
@@ -225,14 +227,14 @@ def draw_all_descent_steps(func, grad, start, eps, single=True):
         plt.legend()
         plt.show()
     else:
+        # draw_const_descent_steps(func, grad, start, eps, "yellow", True, "Const")
         draw_descent_steps(func, grad, start, None, eps, "white", True, "LinearSearcher")
         draw_descent_steps(func, grad, start, BisectionSearcher, eps, "red", True, "BisectionSearcher")
-        draw_descent_steps(func, grad, start, GoldenRatioSearcher, eps, "green", True,
-                           "GoldenRatioSearcher")
-        draw_descent_steps(func, grad, start, FibonacciSearcher, eps, "blue", True,
-                           "FibonacciSearcher")
-        draw_const_descent_steps(func, grad, start, eps, "yellow", True,
-                                 "Const")
+        # draw_descent_steps(func, grad, start, GoldenRatioSearcher, eps, "green", True,
+        #                    "GoldenRatioSearcher")
+        # draw_descent_steps(func, grad, start, FibonacciSearcher, eps, "blue", True,
+        #                    "FibonacciSearcher")
+
 
 
 def run_all_gradients(f, g, start, eps):
@@ -261,9 +263,25 @@ def task2():
 
 
 def task6():
-    start = [1, 1]
+    def f1(x: np.ndarray):
+        f = ((x[0] - 17) - 3 * x[1]) ** 2 + 4 * x[0] ** 2 - 8 * x[0]
+        return f
+
+    def f1_grad(x: np.ndarray):
+        f = [2 * (x[0] - 17) - 3 * 2 * x[1] + 2 * 4 * x[0] - 8, 3 * 3 * x[1] - 3 * 2 * (x[0] - 14)]
+        return f
+
+    def f2(x: np.ndarray):
+        f = ((x[0] - 17) - 3 * x[1]) ** 2
+        return f
+
+    def f2_grad(x: np.ndarray):
+        f = [2 * (x[0] - 17) - 3 * 2 * x[1], 3 * 3 * x[1] - 3 * 2 * (x[0] - 14)]
+        return f
+
+    start = [-1, 10]
     eps = 1e-9
     m = generate_matrix(2, 0.001)
-    f_1 = f_by_matrix(m)
-    f_1_grad = f_grad_by_matrix(m)
-    draw_all_descent_steps(f_1, f_1_grad, start, eps, False)
+    # f_1 = f_by_matrix(m)
+    # f_1_grad = f_grad_by_matrix(m)
+    draw_all_descent_steps(f1, f1_grad, start, eps, False)
