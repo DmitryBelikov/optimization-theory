@@ -282,14 +282,9 @@ def task6():
     start = [-1, 10]
     eps = 1e-9
     m = generate_matrix(2, 0.001)
-<<<<<<< HEAD
-    # f_1 = f_by_matrix(m)
-    # f_1_grad = f_grad_by_matrix(m)
-    draw_all_descent_steps(f1, f1_grad, start, eps, False)
-=======
     f_1 = f_by_matrix(m)
     f_1_grad = f_grad_by_matrix(m)
-    draw_all_descent_steps(f_1, f_1_grad, start, eps, False)
+    draw_all_descent_steps(f1, f1_grad, start, eps, False)
 
 
 def task7():
@@ -314,4 +309,3 @@ def task7():
     cs = plt.imshow(zs, interpolation='bilinear', cmap=plt.get_cmap("hot"),
                     origin='lower')
     plt.show()
->>>>>>> 590c538d077c985ceb0fe3c3682d5d6831a3ed9a
