@@ -1,8 +1,9 @@
+import random
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.ticker import Locator
 import matplotlib.cm as cm
-from Lab1.gradient_descent import gradient_descent
+from Lab1.gradient_descent import gradient_descent, const_gradient_descent
 from Lab1.methods import *
 
 
@@ -22,6 +23,36 @@ def f2(x):
 
 def f2_grad(x):
     return -4 * x - 5
+
+
+def norm(matrix):
+    return np.linalg.norm(matrix, ord=2)
+
+
+def get_condition_number(matrix):
+    return norm(matrix) * norm(np.linalg.inv(matrix))
+
+
+def generate_matrix(n, condition_number):
+    matrix = np.zeros((n, n))
+    matrix[0, 0] = 1.0
+    matrix[-1, -1] = condition_number
+    for i in range(1, n - 1):
+        matrix[i, i] = random.uniform(1.0, condition_number)
+
+    return matrix
+
+
+def f_by_matrix(matrix: np.ndarray):
+    return lambda vec: np.array(vec).dot(matrix).dot(vec)
+
+
+def f_grad_by_matrix(matrix: np.ndarray):
+    def grad(vec):
+        vec = np.array(vec)
+        return [2.0 * vec[i] * matrix[i, i] for i in range(len(vec))]
+
+    return grad
 
 
 def f3(x: np.ndarray):
@@ -122,12 +153,32 @@ def draw_double_arg_function(func, xlims, ylims, show=False):
 
 def draw_descent_steps(func, grad, start, searcher, eps, color="white", show=False, name=""):
     res, it, path = gradient_descent(func, grad, start, eps, searcher)
-    # diff = path - res
-    # dist = []
-    # for i in diff:
-    #     dist.append(np.linalg.norm(i))
-    # distance = np.average(dist)
-    # print(distance)
+    distance = np.linalg.norm(start - res)
+    xlims = (res[0] - distance, res[0] + distance)
+    ylims = (res[1] - distance, res[1] + distance)
+    if show:
+        draw_double_arg_function(func, xlims, ylims)
+    plt.xlim(xlims[0], xlims[1])
+    plt.ylim(ylims[0], ylims[1])
+    plt.xlabel("X")
+    plt.ylabel("Y")
+    plt.title("Gradient descent steps")
+    prev_step = None
+    for step in path:
+        if prev_step is not None:
+            plt.plot([prev_step[0], step[0]],
+                     [prev_step[1], step[1]], linewidth=1, c=color)
+            plt.scatter(step[0], step[1], c=color, s=3)
+        else:
+            plt.scatter(step[0], step[1], c=color, s=3, label=name)
+        prev_step = step
+    if show:
+        plt.legend()
+        plt.show()
+
+
+def draw_const_descent_steps(func, grad, start, eps, color="white", show=False, name=""):
+    res, it, path = const_gradient_descent(func, grad, start, eps)
     distance = np.linalg.norm(start - res)
     xlims = (res[0] - distance, res[0] + distance)
     ylims = (res[1] - distance, res[1] + distance)
@@ -167,6 +218,8 @@ def draw_all_descent_steps(func, grad, start, eps, single=True):
                            "GoldenRatioSearcher")
         draw_descent_steps(func, grad, start + [3 * delta, 0], FibonacciSearcher, eps, "blue", False,
                            "FibonacciSearcher")
+        draw_const_descent_steps(func, grad, start + [4 * delta, 0], eps, "blue", False,
+                                 "Const")
         plt.legend()
         plt.show()
     else:
@@ -176,6 +229,8 @@ def draw_all_descent_steps(func, grad, start, eps, single=True):
                            "GoldenRatioSearcher")
         draw_descent_steps(func, grad, start, FibonacciSearcher, eps, "blue", True,
                            "FibonacciSearcher")
+        draw_const_descent_steps(func, grad, start, eps, "blue", True,
+                                 "Const")
 
 
 def run_all_gradients(f, g, start, eps):
@@ -204,6 +259,9 @@ def task2():
 
 
 def task6():
-    start = [25, -40]
-    eps = 1e-18
-    draw_all_descent_steps(f3, f3_grad, start, eps, False)
+    start = [0.1, 0.1]
+    eps = 1e-9
+    m = generate_matrix(2, 5)
+    f_1 = f_by_matrix(m)
+    f_1_grad = f_grad_by_matrix(m)
+    draw_all_descent_steps(f_1, f_1_grad, start, eps, False)
