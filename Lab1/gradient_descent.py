@@ -70,6 +70,7 @@ def const_gradient_descent(func, grad, w0, eps=1e-9, step=0.1):
         w -= delta_w
         path.append(w.copy())
         iterations += 1
+        # print(w)
         if alpha < 1e-20:
             # print("Alpha = 0")
             break

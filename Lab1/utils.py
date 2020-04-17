@@ -162,7 +162,7 @@ def draw_descent_steps(func, grad, start, searcher, eps, color="white", show=Fal
     plt.ylim(ylims[0], ylims[1])
     plt.xlabel("X")
     plt.ylabel("Y")
-    plt.title("Gradient descent steps")
+    plt.title("Gradient descent steps\n" + "Iterations: " + str(it) + "\n" + "Root: \n%.9f\n%.9f " % (res[0], res[1]))
     prev_step = None
     for step in path:
         if prev_step is not None:
@@ -174,11 +174,12 @@ def draw_descent_steps(func, grad, start, searcher, eps, color="white", show=Fal
         prev_step = step
     if show:
         plt.legend()
+        # plt.savefig("D:/res/" + name)
         plt.show()
 
 
 def draw_const_descent_steps(func, grad, start, eps, color="white", show=False, name=""):
-    res, it, path = const_gradient_descent(func, grad, start, eps)
+    res, it, path = const_gradient_descent(func, grad, start, eps, 0.5)
     distance = np.linalg.norm(start - res)
     xlims = (res[0] - distance, res[0] + distance)
     ylims = (res[1] - distance, res[1] + distance)
@@ -188,7 +189,7 @@ def draw_const_descent_steps(func, grad, start, eps, color="white", show=False, 
     plt.ylim(ylims[0], ylims[1])
     plt.xlabel("X")
     plt.ylabel("Y")
-    plt.title("Gradient descent steps")
+    plt.title("Gradient descent steps\n" + "Iterations: " + str(it) + "\n" + "Root: \n%.9f\n%.9f " % (res[0], res[1]))
     prev_step = None
     for step in path:
         if prev_step is not None:
@@ -200,6 +201,7 @@ def draw_const_descent_steps(func, grad, start, eps, color="white", show=False, 
         prev_step = step
     if show:
         plt.legend()
+        # plt.savefig("D:/res/" + name)
         plt.show()
 
 
@@ -218,7 +220,7 @@ def draw_all_descent_steps(func, grad, start, eps, single=True):
                            "GoldenRatioSearcher")
         draw_descent_steps(func, grad, start + [3 * delta, 0], FibonacciSearcher, eps, "blue", False,
                            "FibonacciSearcher")
-        draw_const_descent_steps(func, grad, start + [4 * delta, 0], eps, "blue", False,
+        draw_const_descent_steps(func, grad, start + [4 * delta, 0], eps, "pink", False,
                                  "Const")
         plt.legend()
         plt.show()
@@ -229,7 +231,7 @@ def draw_all_descent_steps(func, grad, start, eps, single=True):
                            "GoldenRatioSearcher")
         draw_descent_steps(func, grad, start, FibonacciSearcher, eps, "blue", True,
                            "FibonacciSearcher")
-        draw_const_descent_steps(func, grad, start, eps, "blue", True,
+        draw_const_descent_steps(func, grad, start, eps, "yellow", True,
                                  "Const")
 
 
@@ -259,9 +261,9 @@ def task2():
 
 
 def task6():
-    start = [0.1, 0.1]
+    start = [1, 1]
     eps = 1e-9
-    m = generate_matrix(2, 5)
+    m = generate_matrix(2, 0.001)
     f_1 = f_by_matrix(m)
     f_1_grad = f_grad_by_matrix(m)
     draw_all_descent_steps(f_1, f_1_grad, start, eps, False)
