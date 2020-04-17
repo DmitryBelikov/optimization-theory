@@ -5,6 +5,7 @@ setup(name='optimization',
       packages=find_packages(),
       install_requires=[
           'scipy==1.4.1',
-          'numpy==1.18.2', 'matplotlib'
+          'numpy==1.18.2',
+          'matplotlib'
       ]
       )
