@@ -282,6 +282,36 @@ def task6():
     start = [-1, 10]
     eps = 1e-9
     m = generate_matrix(2, 0.001)
+<<<<<<< HEAD
     # f_1 = f_by_matrix(m)
     # f_1_grad = f_grad_by_matrix(m)
     draw_all_descent_steps(f1, f1_grad, start, eps, False)
+=======
+    f_1 = f_by_matrix(m)
+    f_1_grad = f_grad_by_matrix(m)
+    draw_all_descent_steps(f_1, f_1_grad, start, eps, False)
+
+
+def task7():
+    n_range = range(1, 50)
+    k_range = range(1, 5)
+    zs = []
+    for n in n_range:
+        tmp = []
+        max_its = 0
+        for k_ in k_range:
+            k = 2 ** (-k_)
+            m = generate_matrix(n, k)
+            f = f_by_matrix(m)
+            f_grad = f_grad_by_matrix(m)
+            start = np.ones(n) * 1
+            res, it, path = gradient_descent(f, f_grad, start, 1e-3, BisectionSearcher)
+            tmp.append(it)
+            max_its = max(max_its, it)
+        print(max_its)
+        zs.append(tmp)
+    zs = np.array(zs)
+    cs = plt.imshow(zs, interpolation='bilinear', cmap=plt.get_cmap("hot"),
+                    origin='lower')
+    plt.show()
+>>>>>>> 590c538d077c985ceb0fe3c3682d5d6831a3ed9a
