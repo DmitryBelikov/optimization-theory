@@ -5,6 +5,7 @@ from matplotlib.ticker import Locator
 import matplotlib.cm as cm
 from Lab1.gradient_descent import gradient_descent, const_gradient_descent
 from Lab1.methods import *
+from Lab1.newton import newton
 
 
 def f1(x: np.ndarray):
@@ -35,11 +36,10 @@ def get_condition_number(matrix):
 
 def generate_matrix(n, condition_number):
     matrix = np.zeros((n, n))
-    matrix[0, 0] = 1.0
     matrix[-1, -1] = condition_number
+    matrix[0, 0] = 1.0
     for i in range(1, n - 1):
         matrix[i, i] = random.uniform(1.0, condition_number)
-
     return matrix
 
 
@@ -164,7 +164,7 @@ def draw_descent_steps(func, grad, start, searcher, eps, color="white", show=Fal
     plt.ylim(ylims[0], ylims[1])
     plt.xlabel("X")
     plt.ylabel("Y")
-    plt.title("Gradient descent steps\n" + "Iterations: " + str(it) + "\n" + "Root: \n%.9f\n%.9f " % (res[0], res[1]))
+    plt.title("Iterations: " + str(it) + ", Root:\n%.9f\n%.9f" % (res[0], res[1]))
     prev_step = None
     for step in path:
         if prev_step is not None:
@@ -191,7 +191,7 @@ def draw_const_descent_steps(func, grad, start, eps, color="white", show=False, 
     plt.ylim(ylims[0], ylims[1])
     plt.xlabel("X")
     plt.ylabel("Y")
-    plt.title("Gradient descent steps\n" + "Iterations: " + str(it) + "\n" + "Root: \n%.9f\n%.9f " % (res[0], res[1]))
+    plt.title("Iterations: " + str(it) + ", Root:\n%.9f\n%.9f" % (res[0], res[1]))
     prev_step = None
     for step in path:
         if prev_step is not None:
@@ -207,7 +207,33 @@ def draw_const_descent_steps(func, grad, start, eps, color="white", show=False, 
         plt.show()
 
 
-def draw_all_descent_steps(func, grad, start, eps, single=True):
+def draw_newton_steps(func, grad, grad2, start, eps, color="white", show=False, name=""):
+    res, it, path = newton(func, grad, grad2, start, eps, 1e-2)
+    distance = np.linalg.norm(start - res)
+    xlims = (res[0] - distance, res[0] + distance)
+    ylims = (res[1] - distance, res[1] + distance)
+    if show:
+        draw_double_arg_function(func, xlims, ylims)
+    plt.xlim(xlims[0], xlims[1])
+    plt.ylim(ylims[0], ylims[1])
+    plt.xlabel("X")
+    plt.ylabel("Y")
+    plt.title("Iterations: " + str(it) + ", Root:\n%.9f\n%.9f" % (res[0], res[1]))
+    prev_step = None
+    for step in path:
+        if prev_step is not None:
+            plt.plot([prev_step[0], step[0]],
+                     [prev_step[1], step[1]], linewidth=1, c=color)
+            plt.scatter(step[0], step[1], c=color, s=3)
+        else:
+            plt.scatter(step[0], step[1], c=color, s=3, label=name)
+        prev_step = step
+    if show:
+        plt.legend()
+        # plt.savefig("D:/res/" + name)
+        plt.show()
+
+def draw_all_descent_steps(func, grad, grad2, start, eps, single=True):
     if single:
         start = np.array(start)
         res, it, path = gradient_descent(func, grad, start, eps, None)
@@ -222,19 +248,21 @@ def draw_all_descent_steps(func, grad, start, eps, single=True):
                            "GoldenRatioSearcher")
         draw_descent_steps(func, grad, start + [3 * delta, 0], FibonacciSearcher, eps, "blue", False,
                            "FibonacciSearcher")
-        draw_const_descent_steps(func, grad, start + [4 * delta, 0], eps, "pink", False,
-                                 "Const")
+        draw_const_descent_steps(func, grad, start + [4 * delta, 0], eps, "yellow", False,
+                                 "Const, step = 1e-2")
+        draw_newton_steps(func, grad, grad2, start + [5 * delta, 0], eps, "orange", False, "Newton")
+        
         plt.legend()
         plt.show()
     else:
-        # draw_const_descent_steps(func, grad, start, eps, "yellow", True, "Const")
         draw_descent_steps(func, grad, start, None, eps, "white", True, "LinearSearcher")
         draw_descent_steps(func, grad, start, BisectionSearcher, eps, "red", True, "BisectionSearcher")
-        # draw_descent_steps(func, grad, start, GoldenRatioSearcher, eps, "green", True,
-        #                    "GoldenRatioSearcher")
-        # draw_descent_steps(func, grad, start, FibonacciSearcher, eps, "blue", True,
-        #                    "FibonacciSearcher")
-
+        draw_descent_steps(func, grad, start, GoldenRatioSearcher, eps, "green", True,
+                           "GoldenRatioSearcher")
+        draw_descent_steps(func, grad, start, FibonacciSearcher, eps, "blue", True,
+                           "FibonacciSearcher")
+        draw_const_descent_steps(func, grad, start, eps, "yellow", True, "Const, step = 1e-2")
+        draw_newton_steps(func, grad, grad2, start, eps, "orange", True, "Newton")
 
 
 def run_all_gradients(f, g, start, eps):
@@ -268,7 +296,14 @@ def task6():
         return f
 
     def f1_grad(x: np.ndarray):
-        f = [2 * (x[0] - 17) - 3 * 2 * x[1] + 2 * 4 * x[0] - 8, 3 * 3 * x[1] - 3 * 2 * (x[0] - 14)]
+        f = [10 * x[0] - 6 * (7 + x[1]), -6 * (-17 + x[0] - 3 * x[1])]
+        return f
+
+    def f1_grad2(x: np.ndarray):
+        f = [
+            [10, -6],
+            [-6, 18]
+        ]
         return f
 
     def f2(x: np.ndarray):
@@ -279,33 +314,36 @@ def task6():
         f = [2 * (x[0] - 17) - 3 * 2 * x[1], 3 * 3 * x[1] - 3 * 2 * (x[0] - 14)]
         return f
 
+
     start = [-1, 10]
     eps = 1e-9
     m = generate_matrix(2, 0.001)
     f_1 = f_by_matrix(m)
     f_1_grad = f_grad_by_matrix(m)
-    draw_all_descent_steps(f1, f1_grad, start, eps, False)
+    draw_all_descent_steps(f1, f1_grad, f1_grad2, start, eps, False)
+    draw_all_descent_steps(f1, f1_grad, f1_grad2, start, eps, True)
 
 
 def task7():
-    n_range = range(1, 50)
-    k_range = range(1, 5)
+    n_range = range(3, 20)
+    k_range = [2, 3, 4, 5, 10, 20, 25, 50, 100, 150, 200, 250, 500, 1000]
     zs = []
+    random.seed(12856)
     for n in n_range:
         tmp = []
         max_its = 0
         for k_ in k_range:
-            k = 2 ** (-k_)
+            k = k_
             m = generate_matrix(n, k)
+            # print(get_condition_number(m))
             f = f_by_matrix(m)
             f_grad = f_grad_by_matrix(m)
             start = np.ones(n) * 1
-            res, it, path = gradient_descent(f, f_grad, start, 1e-3, BisectionSearcher)
+            res, it, path = gradient_descent(f, f_grad, start, 1e-9, BisectionSearcher)
             tmp.append(it)
-            max_its = max(max_its, it)
-        print(max_its)
+        print(tmp)
         zs.append(tmp)
     zs = np.array(zs)
-    cs = plt.imshow(zs, interpolation='bilinear', cmap=plt.get_cmap("hot"),
+    cs = plt.imshow(zs, interpolation='bicubic', cmap=plt.get_cmap("hot"),
                     origin='lower')
     plt.show()
