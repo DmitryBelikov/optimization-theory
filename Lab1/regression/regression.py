@@ -10,7 +10,7 @@ from Lab1.methods import BisectionSearcher
 def regression_function(X, y, w, reg):
     samples = X.shape[0]
     exp_arg = -y * X.dot(w.T)
-    return np.ones((1, samples)).dot(np.logaddexp(0, exp_arg)).item() + reg * w[0] * w[0]
+    return np.ones((1, samples)).dot(np.logaddexp(0, exp_arg)).item() + reg / 2 * w[0] * w[0]
 
 
 def regression_gradient(X, y, w, reg):
@@ -59,7 +59,7 @@ def logistic_regression(X, y):
     min_hess = minimization_hessian(X, y, reg)
     optimizer_descent = GradientDescent(min_func, min_grad, searcher=BisectionSearcher)
     optimizer_newton = Newton(min_func, min_grad, min_hess)
-    w0 = np.array([0] * X.shape[1], dtype=np.float)
+    w0 = np.zeros(X.shape[1])
     descent_result = process_task(optimizer_descent, w0)
     newton_result = process_task(optimizer_newton, w0)
     return descent_result, newton_result
@@ -88,8 +88,11 @@ def train_regression(dataset_path):
     plt.scatter(df.col_1, df.col_2, color=df.binaryClass.map(lambda c: 'red' if c == 'P' else 'blue'))
     plt.show()
 
+    np.set_printoptions(precision=10)
+    print('Newton result: {}'.format(weights_newton))
     print('Newton took {} iterations and {:.2f} seconds to complete'.
           format(newton_result['iters'], newton_result['time']))
+    print('Gradient descent result: {}'.format(weights_descent))
     print('Gradient descent took {} iterations and {:.2f} seconds to complete'.
           format(descent_result['iters'], descent_result['time']))
 
