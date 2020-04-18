@@ -12,7 +12,7 @@ def stop_criterion(grad, w, w0, eps):
 
 def stop_criterion_dx(grad, w, w0, eps):
     norm = np.linalg.norm(w - w0)
-    return norm < 1e-10
+    return norm < eps
 
 
 class GradientStepSelector:
@@ -87,6 +87,6 @@ def const_gradient_descent(func, grad, w0, eps=1e-9, step=0.1, stop_criterion=st
         if alpha < 1e-20:
             # print("Alpha = 0")
             break
-        if iterations > 50:
+        if iterations > 10000:
             break
     return w, iterations, path

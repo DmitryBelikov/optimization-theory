@@ -17,8 +17,8 @@ def main():
     # print("LinearStepSearch", gradient_descent(f3, f3_grad, [-2, 51], 1e-9, None))
     # task1()
     # task2()
-    # task6()
-    task7()
+    task6()
+    # task7()
 
 
 if __name__ == '__main__':

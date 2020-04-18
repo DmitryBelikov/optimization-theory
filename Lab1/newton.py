@@ -1,7 +1,6 @@
 import numpy as np
 
-# from .utils import hessian
-
+from scipy.linalg import cho_factor, cho_solve
 
 def stop_criterion(grad, w, w0, eps):
     grad_w = grad(w)
@@ -10,8 +9,18 @@ def stop_criterion(grad, w, w0, eps):
     return norm
 
 
+def stop_criterion_dx(grad, w, w0, eps):
+    norm = np.linalg.norm(w - w0)
+    return norm < eps
+
+
 def get_d(hess, grad: np.ndarray):
-    return np.linalg.solve(hess, -grad)
+    # return np.linalg.solve(hess, -grad)
+    # df2 = f_two_prime(x_0)
+    # df = f_prime(x_0)
+    df2_i = cho_solve(cho_factor(hess), np.eye(len(hess)))
+    d = np.matmul(grad, df2_i)
+    return -d
 
 
 def hessian(w, grad):
@@ -28,15 +37,18 @@ def hessian(w, grad):
     return h
 
 
-def newton(func, grad, grad2, w0, eps=1e-9, searcher=None):
+def newton(func, grad, grad2, w0, eps=1e-9, searcher=None, stop_criterion=stop_criterion_dx):
     w0 = np.array(w0.copy(), np.float64)
     w = np.array(w0.copy(), np.float64)
     iterations = 0
     path = [w0]
-    while not stop_criterion(grad, w, w0, eps):
+    first = True
+    while first or not stop_criterion(grad, w, w0, eps):
+        first = False
         gradient_value = get_d(grad2(w), np.array(grad(w)))
         alpha = 1.0
         delta_w = alpha * gradient_value
+        w0 = w.copy()
         w += delta_w
         path.append(w.copy())
         iterations += 1
