@@ -3,12 +3,15 @@ import matplotlib.pyplot as plt
 
 import numpy as np
 
+to_print = False
+
 
 class Searcher:
     def __init__(self, func):
         self.func = func
         self.iterations = -1
         self.function_calls = -1
+        self.to_print = False
 
     @abstractmethod
     def search(self, a, b, eps): raise NotImplemented
@@ -103,6 +106,8 @@ class BisectionSearcher(Searcher):
                 a = ml
                 b = mr
                 return a, b, self.iterations, self.function_calls
+            if self.to_print:
+                print("len:", np.linalg.norm(b - a))
         return a, b, self.iterations, self.function_calls
 
 
@@ -138,6 +143,8 @@ class GoldenRatioSearcher(Searcher):
                 temp_l = a + (1 - self.ratio) * (b - a)
             else:
                 return a, b, self.iterations, self.function_calls
+            if self.to_print:
+                print("len:", np.linalg.norm(b - a))
         return a, b, self.iterations, self.function_calls
 
 
@@ -184,6 +191,8 @@ class FibonacciSearcher(Searcher):
                 b = temp_r
                 temp_r = temp_l
                 temp_l = a + fib[n - k - 2] / fib[n - k] * (b - a)
+            if self.to_print:
+                print("len:", np.linalg.norm(b - a))
         temp_l = temp_l
         temp_r = temp_l + self.gamma
         self.function_calls += 2

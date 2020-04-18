@@ -1,6 +1,5 @@
-from Lab1.gradient_descent import gradient_descent
-from Lab1.methods import *
 from Lab1.utils import *
+import Lab1.methods
 
 
 # Single search
@@ -13,12 +12,17 @@ from Lab1.utils import *
 
 
 def main():
-    draw_descent_steps(f4, f4_grad, start, GoldenRatioSearcher, eps)
-    print("LinearStepSearch", gradient_descent(f3, f3_grad, [-2, 51], 1e-9, None))
+    # draw_descent_steps(f4, f4_grad, start, GoldenRatioSearcher, eps)
+    # print("LinearStepSearch", gradient_descent(f3, f3_grad, [-2, 51], 1e-9, None))
     task1()
     task2()
     task6()
-    task7()
+    # task7()
+
+def len_change():
+    searcher = BisectionSearcher(f1)
+    searcher.to_print = True
+    print(searcher.search(-5, 5, 1e-9))
 
 
 if __name__ == '__main__':
