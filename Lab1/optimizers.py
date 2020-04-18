@@ -17,7 +17,7 @@ class Newton(Optimizer):
         self.eps = eps
 
     def minimize(self, x):
-        return newton(self.func, self.grad, self.hess, x, self.eps, None)
+        return newton(self.func, self.grad, self.hess, x, self.eps, None)[0]
 
 
 class GradientDescent(Optimizer):
@@ -29,4 +29,4 @@ class GradientDescent(Optimizer):
         self.stop_criterion = stop_criterion
 
     def minimize(self, x):
-        return gradient_descent(self.func, self.grad, x, self.eps, self.searcher, self.stop_criterion)
+        return gradient_descent(self.func, self.grad, x, self.eps, self.searcher, self.stop_criterion)[0]
