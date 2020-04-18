@@ -60,10 +60,10 @@ def gradient_descent(func, grad, w0, eps=1e-9, searcher=None, stop_criterion=sto
         w -= delta_w
         path.append(w.copy())
         iterations += 1
-        if alpha < 1e-20:
+        # if alpha < 1e-20:
             # print("Alpha = 0")
-            break
-        if iterations > 50:
+            # break
+        if iterations > 10000:
             break
     return w, iterations, path
 

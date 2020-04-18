@@ -35,11 +35,10 @@ def get_condition_number(matrix):
 
 def generate_matrix(n, condition_number):
     matrix = np.zeros((n, n))
-    matrix[0, 0] = 1.0
     matrix[-1, -1] = condition_number
+    matrix[0, 0] = 1.0
     for i in range(1, n - 1):
         matrix[i, i] = random.uniform(1.0, condition_number)
-
     return matrix
 
 
@@ -236,7 +235,6 @@ def draw_all_descent_steps(func, grad, start, eps, single=True):
         #                    "FibonacciSearcher")
 
 
-
 def run_all_gradients(f, g, start, eps):
     res, it, _ = gradient_descent(f, g, start, eps, None)
     print("LinearStepSearch\n    ans =", list(res), "\n    amount of iterations =", it)
@@ -288,24 +286,24 @@ def task6():
 
 
 def task7():
-    n_range = range(1, 50)
-    k_range = range(1, 5)
+    n_range = range(2, 20)
+    k_range = [1, 2, 3, 4, 5, 10, 20, 25, 50, 100, 150, 200, 250, 500, 1000, 2000]
     zs = []
     for n in n_range:
         tmp = []
         max_its = 0
         for k_ in k_range:
-            k = 2 ** (-k_)
+            k = k_
             m = generate_matrix(n, k)
+            print(get_condition_number(m))
             f = f_by_matrix(m)
             f_grad = f_grad_by_matrix(m)
             start = np.ones(n) * 1
-            res, it, path = gradient_descent(f, f_grad, start, 1e-3, BisectionSearcher)
+            res, it, path = gradient_descent(f, f_grad, start, 1e-9, BisectionSearcher)
             tmp.append(it)
-            max_its = max(max_its, it)
-        print(max_its)
+        print(tmp)
         zs.append(tmp)
     zs = np.array(zs)
-    cs = plt.imshow(zs, interpolation='bilinear', cmap=plt.get_cmap("hot"),
+    cs = plt.imshow(zs, interpolation='none', cmap=plt.get_cmap("hot"),
                     origin='lower')
     plt.show()
