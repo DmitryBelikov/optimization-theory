@@ -325,16 +325,17 @@ def task6():
 
 
 def task7():
-    n_range = range(2, 20)
-    k_range = [1, 2, 3, 4, 5, 10, 20, 25, 50, 100, 150, 200, 250, 500, 1000, 2000]
+    n_range = range(3, 20)
+    k_range = [2, 3, 4, 5, 10, 20, 25, 50, 100, 150, 200, 250, 500, 1000]
     zs = []
+    random.seed(12856)
     for n in n_range:
         tmp = []
         max_its = 0
         for k_ in k_range:
             k = k_
             m = generate_matrix(n, k)
-            print(get_condition_number(m))
+            # print(get_condition_number(m))
             f = f_by_matrix(m)
             f_grad = f_grad_by_matrix(m)
             start = np.ones(n) * 1
@@ -343,6 +344,6 @@ def task7():
         print(tmp)
         zs.append(tmp)
     zs = np.array(zs)
-    cs = plt.imshow(zs, interpolation='none', cmap=plt.get_cmap("hot"),
+    cs = plt.imshow(zs, interpolation='bicubic', cmap=plt.get_cmap("hot"),
                     origin='lower')
     plt.show()
