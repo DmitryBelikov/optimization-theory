@@ -22,7 +22,8 @@ def regression_hessian(X, y, w, reg):
     m, n = X.shape
     exp_arg = -y * X.dot(w.T)
     exp_division = scipy.special.expit(exp_arg)
-    return X.T.dot(X) * sum(y ** 2 * exp_division / (1 + np.exp(exp_arg))) + reg * np.eye(n)
+    no_xs = (y ** 2 * exp_division / (1 + np.exp(exp_arg))).reshape((m, 1))
+    return (X * no_xs).T.dot(X) + reg * np.eye(n)
 
 
 def minimization_function(X, y, reg):
