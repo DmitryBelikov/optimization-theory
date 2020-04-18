@@ -4,7 +4,7 @@ import scipy.special
 import matplotlib.pyplot as plt
 import time
 from Lab1.optimizers import GradientDescent, Newton
-from Lab1.methods import GoldenRatioSearcher
+from Lab1.methods import BisectionSearcher
 
 
 def regression_function(X, y, w, reg):
@@ -20,15 +20,9 @@ def regression_gradient(X, y, w, reg):
 
 def regression_hessian(X, y, w, reg):
     m, n = X.shape
-    result = np.zeros((n, n))
-    for k in range(n):
-        for j in range(n):
-            for i in range(m):
-                exp_part = np.exp(-y[i] * np.inner(X[i], w))
-                special_part = scipy.special.expit(-y[i] * np.inner(X[i], w))
-                result[k, j] += y[i] ** 2 * X[i, k] * X[i, j] * special_part / exp_part
-    result += reg * np.eye(n)
-    return result
+    exp_arg = -y * X.dot(w.T)
+    exp_division = scipy.special.expit(exp_arg)
+    return X.T.dot(X) * sum(y ** 2 * exp_division / (1 + np.exp(exp_arg))) + reg * np.eye(n)
 
 
 def minimization_function(X, y, reg):
@@ -62,8 +56,8 @@ def logistic_regression(X, y):
     min_func = minimization_function(X, y, reg)
     min_grad = minimization_gradient(X, y, reg)
     min_hess = minimization_hessian(X, y, reg)
-    optimizer_descent = GradientDescent(min_func, min_grad, eps=1e-15, searcher=GoldenRatioSearcher)
-    optimizer_newton = Newton(min_func, min_grad, min_hess, eps=1e-15)
+    optimizer_descent = GradientDescent(min_func, min_grad, searcher=BisectionSearcher)
+    optimizer_newton = Newton(min_func, min_grad, min_hess)
     w0 = np.array([0] * X.shape[1], dtype=np.float)
     descent_result = process_task(optimizer_descent, w0)
     newton_result = process_task(optimizer_newton, w0)
@@ -93,8 +87,10 @@ def train_regression(dataset_path):
     plt.scatter(df.col_1, df.col_2, color=df.binaryClass.map(lambda c: 'red' if c == 'P' else 'blue'))
     plt.show()
 
-    print('Newton took {} iterations and {} seconds to complete'.format(newton_result['iters'], newton_result['time']))
-    print('Gradient descent took {} iteration and {} seconds to complete'.format(descent_result['iters'], descent_result['time']))
+    print('Newton took {} iterations and {:.2f} seconds to complete'.
+          format(newton_result['iters'], newton_result['time']))
+    print('Gradient descent took {} iterations and {:.2f} seconds to complete'.
+          format(descent_result['iters'], descent_result['time']))
 
 
 if __name__ == '__main__':
